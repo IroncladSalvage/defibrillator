@@ -23,9 +23,16 @@ Milestones (in order):
 - Phase 4: Complex Features — external deps
 - Phase 5: Publishing — badges, feeds
 
+Use the Oracle or other subagent to improve/design issues that lack important information before working on them.
+
+Each task should have its own branch and pull request on the repo.
+
 ## Commands
 
+Example:
+
 ```bash
+uv sync
 uv run python scripts/validate.py
 uv run python scripts/generate_digest.py
 ```
