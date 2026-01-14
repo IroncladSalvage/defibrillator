@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Generate README tables and individual info pages for repositories."""
 
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
 
 import yaml
+
+from defibrillator.staleness import compute_staleness, StalenessResult
 
 STATUS_EMOJI = {
     "active": "🟢",
@@ -21,6 +24,11 @@ CI_EMOJI = {
 }
 
 PRIORITY_ORDER = {"critical": 0, "high": 1, "normal": 2, "low": 3}
+
+STALE_WARNING_DAYS = int(os.getenv("STALE_WARNING_DAYS", "75"))
+STALE_CRITICAL_DAYS = int(os.getenv("STALE_CRITICAL_DAYS", "90"))
+
+STALE_EMOJI = {"ok": "✅", "warning": "⚠️", "critical": "🚨"}
 
 
 def load_repos(repos_dir: Path) -> list[dict]:
@@ -79,7 +87,7 @@ def generate_summary_table(repos: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def generate_repo_detail_page(repo: dict) -> str:
+def generate_repo_detail_page(repo: dict, staleness_result: StalenessResult | None = None) -> str:
     """Generate detailed markdown page for a repository."""
     fork = repo.get("fork", {})
     origin = repo.get("origin", {})
@@ -114,6 +122,11 @@ def generate_repo_detail_page(repo: dict) -> str:
     lines.append(f"- **CI:** {CI_EMOJI.get(status.get('ci_status'), '❓')} {status.get('ci_status', 'unknown')}")
     lines.append(f"- **Last Touched:** {status.get('last_touched', 'Unknown')}")
     lines.append(f"- **Last Upstream Commit:** `{origin.get('last_upstream_commit', 'Unknown')}`")
+    
+    if staleness_result:
+        emoji = STALE_EMOJI.get(staleness_result.severity, "")
+        days_str = f"{staleness_result.days_stale} days" if staleness_result.days_stale is not None else "N/A"
+        lines.append(f"- **Staleness:** {emoji} {days_str} ({staleness_result.severity})")
     
     if status.get("notes"):
         lines.append(f"- **Notes:** {status['notes']}")
@@ -217,17 +230,17 @@ def update_readme(readme_path: Path, overview_table: str, repos_table: str) -> N
     print(f"Updated: {readme_path}")
 
 
-def generate_info_pages(repos: list[dict], info_dir: Path) -> None:
+def generate_info_pages(repos: list[dict], info_dir: Path, staleness_map: dict[str, StalenessResult]) -> None:
     """Generate individual info pages for each repository."""
-    # Clear and recreate info directory
     if info_dir.exists():
         shutil.rmtree(info_dir)
     info_dir.mkdir(parents=True)
     
     for repo in repos:
         file_stem = repo.get("_file", repo.get("fork", {}).get("name", "unknown"))
+        staleness_result = staleness_map.get(file_stem)
         page_path = info_dir / f"{file_stem}.md"
-        page_content = generate_repo_detail_page(repo)
+        page_content = generate_repo_detail_page(repo, staleness_result)
         page_path.write_text(page_content, encoding="utf-8")
         print(f"Generated: {page_path}")
 
@@ -242,11 +255,16 @@ def main() -> None:
     repos = load_repos(repos_dir)
     repos = sort_repos(repos)
     
+    staleness_results = compute_staleness(
+        repos, warning_days=STALE_WARNING_DAYS, critical_days=STALE_CRITICAL_DAYS
+    )
+    staleness_map = {r.file_stem: r for r in staleness_results}
+    
     overview_table = generate_overview_table(repos)
     repos_table = generate_summary_table(repos)
     
     update_readme(readme_path, overview_table, repos_table)
-    generate_info_pages(repos, info_dir)
+    generate_info_pages(repos, info_dir, staleness_map)
     
     print(f"\nProcessed {len(repos)} repository file(s).")
 
