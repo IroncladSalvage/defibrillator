@@ -1,0 +1,53 @@
+# Example repository entry
+origin:
+  url: "https://github.com/abandoned/example-tool"
+  name: "example-tool"
+  last_upstream_commit: "abc123def456"
+  archived_date: "2024-06-15"
+  license: "MIT"
+
+fork:
+  url: "https://github.com/IroncladSalvage/example-tool"
+  name: "example-tool"
+  created_at: "2026-01-13"
+
+status:
+  state: "active"
+  last_touched: "2026-01-13"
+  ci_status: "passing"
+  notes: "Initial fork and CI setup"
+
+languages:
+  - Python
+
+targets:
+  architectures:
+    - amd64
+    - arm64
+  runtimes:
+    - "python3.11+"
+  operating_systems:
+    - linux
+
+artifacts:
+  docker:
+    enabled: true
+    image: "ghcr.io/ironcladsalvage/example-tool"
+  packages:
+    debian: false
+    alpine: false
+    pypi: false
+    npm: false
+
+automation:
+  dependabot: true
+  security_scanning: true
+  auto_release: false
+
+metadata:
+  description: "An example tool for demonstration purposes"
+  tags:
+    - example
+    - demo
+  priority: "normal"
+  upstream_maintainer_contact: ""

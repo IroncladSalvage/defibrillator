@@ -1,0 +1,60 @@
+# Repository configuration template for IroncladSalvage
+# Copy this file to repos/<repo-name>.yaml and fill in the values
+
+# Required: Original repository information
+origin:
+  url: ""                    # Original repository URL (e.g., https://github.com/original/repo)
+  name: ""                   # Original project name
+  last_upstream_commit: ""   # Last commit hash from upstream we synced from
+  archived_date: null        # Date repo was archived (YYYY-MM-DD) or null if not archived
+  license: ""                # SPDX license identifier (e.g., MIT, Apache-2.0, GPL-3.0)
+
+# Required: Our fork information
+fork:
+  url: ""                    # Our fork URL (e.g., https://github.com/IroncladSalvage/repo)
+  name: ""                   # Name in our organization
+  created_at: ""             # Date we forked (YYYY-MM-DD)
+
+# Required: Current maintenance status
+status:
+  state: "active"            # active | life-support | archived | pending
+  last_touched: ""           # Last date we made changes (YYYY-MM-DD)
+  ci_status: "unknown"       # passing | failing | unknown
+  notes: ""                  # Optional notes about current state
+
+# Required: Primary languages used
+languages:
+  - ""                       # e.g., Python, JavaScript, Go, Rust
+
+# Required: Build/deployment targets we maintain
+targets:
+  architectures:
+    - amd64
+    - arm64
+  runtimes: []               # e.g., ["python3.11+", "node20+"]
+  operating_systems:
+    - linux
+
+# Optional: Container/package publishing
+artifacts:
+  docker:
+    enabled: false
+    image: ""                # e.g., ghcr.io/ironcladsalvage/repo
+  packages:
+    debian: false
+    alpine: false
+    pypi: false
+    npm: false
+
+# Optional: Automation configuration
+automation:
+  dependabot: true
+  security_scanning: true
+  auto_release: false
+
+# Optional: Additional metadata
+metadata:
+  description: ""
+  tags: []
+  priority: "normal"         # critical | high | normal | low
+  upstream_maintainer_contact: ""
