@@ -23,9 +23,11 @@ Milestones (in order):
 - Phase 4: Complex Features — external deps
 - Phase 5: Publishing — badges, feeds
 
-Use the Oracle or other subagent to improve/design issues that lack important information before working on them.
+Rules
 
-Each task should have its own branch and pull request on the repo.
+1. Use the Oracle or other subagent to improve/design issues that lack important information before working on them.
+2. Each task should have its own branch and pull request on the repo.
+3. Do not add yourself of any information regading agent or model to the commit message
 
 ## Commands
 
