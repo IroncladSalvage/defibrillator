@@ -34,6 +34,7 @@ Example:
 ```bash
 uv sync
 uv run python scripts/validate.py
+uv run python scripts/validate_licenses.py
 uv run python scripts/generate_digest.py
 ```
 
