@@ -15,7 +15,7 @@ gh issue list --repo IroncladSalvage/defibrillator --label phase-0  # by label
 gh issue view 16 --repo IroncladSalvage/defibrillator             # view specific issue
 ```
 
-Milestones (in order):
+### Milestones (in order):
 - Phase 0: Foundation — shared infra, do first
 - Phase 1: Minimal Triage — repo triage scripts
 - Phase 2: Operational Visibility — dashboard/reports
@@ -23,11 +23,11 @@ Milestones (in order):
 - Phase 4: Complex Features — external deps
 - Phase 5: Publishing — badges, feeds
 
-Rules
+### Rules
 
 1. Use the Oracle or other subagent to improve/design issues that lack important information before working on them.
-2. Each task should have its own branch and pull request on the repo.
-3. Do not add yourself of any information regading agent or model to the commit message
+2. Each issue should have its own branch and pull request on the repo. If multiple issues depend on each other, have their branches stem from the previous issues branch, do not redo work or mix issues.
+3. Do not add yourself of any information regading agent or model to the commit message. No Co-Author.
 
 ## Commands
 
