@@ -33,10 +33,12 @@ Example:
 
 ```bash
 uv sync
-uv run python scripts/validate.py
-uv run python scripts/generate_digest.py
+
+uv run scripts/validate.py
+uv run scripts/validate_licenses.py
+uv run scripts/generate_digest.py
 ```
 
 ## Rules
 
-- **Python**: Always use `uv run python`, never `python` or `pip` directly
+- **Python**: Always use `uv run`, never `python` or `pip` directly
