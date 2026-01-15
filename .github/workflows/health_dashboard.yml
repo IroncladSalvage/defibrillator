@@ -1,0 +1,47 @@
+name: Generate Health Dashboard
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      warning_days:
+        description: 'Warning threshold for days stale'
+        required: false
+        default: '75'
+      critical_days:
+        description: 'Critical threshold for days stale'
+        required: false
+        default: '90'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Generate health dashboard
+        run: |
+          WARNING_DAYS="${{ github.event.inputs.warning_days || 75 }}"
+          CRITICAL_DAYS="${{ github.event.inputs.critical_days || 90 }}"
+          uv run python scripts/health_dashboard.py --warning-days $WARNING_DAYS --critical-days $CRITICAL_DAYS
+
+      - name: Commit changes if any
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add HEALTH.md
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update health dashboard [skip ci]"
+            git push
+          fi
