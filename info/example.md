@@ -16,7 +16,7 @@ _An example tool for demonstration purposes_
 - **CI:** ✅ passing
 - **Last Touched:** 2026-01-13
 - **Last Upstream Commit:** `abc123def456`
-- **Staleness:** ✅ 1 days (ok)
+- **Staleness:** ✅ 2 days (ok)
 - **Notes:** Initial fork and CI setup
 
 ## Targets
