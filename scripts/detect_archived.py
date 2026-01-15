@@ -39,9 +39,7 @@ def today_utc() -> str:
 
 def load_repo_yamls(repos_dir: Path) -> list[tuple[Path, dict[str, Any]]]:
     """Load all repo YAML files from directory."""
-    yaml_files = sorted(
-        list(repos_dir.glob("*.yaml")) + list(repos_dir.glob("*.yml"))
-    )
+    yaml_files = sorted(list(repos_dir.glob("*.yaml")) + list(repos_dir.glob("*.yml")))
     results = []
     for yaml_file in yaml_files:
         try:
@@ -57,7 +55,9 @@ def load_repo_yamls(repos_dir: Path) -> list[tuple[Path, dict[str, Any]]]:
 def write_repo_yaml(path: Path, data: dict[str, Any]) -> None:
     """Write repo data back to YAML file."""
     with open(path, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
+        yaml.dump(
+            data, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+        )
 
 
 def main() -> int:
@@ -110,7 +110,10 @@ def main() -> int:
 
             parsed = parse_owner_repo(origin_url)
             if not parsed:
-                print(f"Warning: Skipping {yaml_path.name}: not a GitHub URL ({origin_url})", file=sys.stderr)
+                print(
+                    f"Warning: Skipping {yaml_path.name}: not a GitHub URL ({origin_url})",
+                    file=sys.stderr,
+                )
                 continue
 
             owner, repo = parsed
@@ -118,7 +121,10 @@ def main() -> int:
             try:
                 repo_info = client.get_json(f"/repos/{owner}/{repo}", use_cache=True)
             except GitHubHTTPError as e:
-                print(f"Warning: Skipping {yaml_path.name}: API error {e.status_code} for {owner}/{repo}", file=sys.stderr)
+                print(
+                    f"Warning: Skipping {yaml_path.name}: API error {e.status_code} for {owner}/{repo}",
+                    file=sys.stderr,
+                )
                 continue
 
             is_archived = repo_info.get("archived", False)
@@ -154,12 +160,18 @@ def main() -> int:
         for r in results:
             if r["updated"]:
                 action = "updated" if args.write else "would update"
-                print(f"🔍 {r['file']}: {r['repo']} is archived ({action} archived_date to {r['archived_date']})")
+                print(
+                    f"🔍 {r['file']}: {r['repo']} is archived ({action} archived_date to {r['archived_date']})"
+                )
             elif r["was_archived"]:
-                print(f"📦 {r['file']}: {r['repo']} is archived (archived_date already set: {r['archived_date']})")
+                print(
+                    f"📦 {r['file']}: {r['repo']} is archived (archived_date already set: {r['archived_date']})"
+                )
 
         print()
-        print(f"Checked {len(results)} repo(s): {archived_count} archived, {updated_count} {'updated' if args.write else 'need update'}")
+        print(
+            f"Checked {len(results)} repo(s): {archived_count} archived, {updated_count} {'updated' if args.write else 'need update'}"
+        )
         if not args.write and updated_count > 0:
             print("Run with --write to update YAML files.")
 

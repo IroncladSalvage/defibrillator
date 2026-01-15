@@ -10,7 +10,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterator, Literal
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode
 
 import requests
 
@@ -169,15 +169,19 @@ class GitHubClient:
 
         return url
 
-    def _should_retry(self, response: requests.Response) -> bool:
+    def _should_retry(self, response: requests.Response | None) -> bool:
         """Check if request should be retried based on response."""
-        if response.status_code == 429:
+        if response is None:
+            return False
+
+        status_code: int = response.status_code  # type: ignore[assignment]
+        if status_code == 429:
             return True
 
-        if response.status_code >= 500:
+        if status_code >= 500:
             return True
 
-        if response.status_code == 403:
+        if status_code == 403:
             remaining = response.headers.get("X-RateLimit-Remaining")
             if remaining == "0":
                 return True
@@ -280,11 +284,7 @@ class GitHubClient:
                     )
 
                 if response.status_code in expected:
-                    if (
-                        method.upper() == "GET"
-                        and use_cache
-                        and self.cache_enabled
-                    ):
+                    if method.upper() == "GET" and use_cache and self.cache_enabled:
                         etag = response.headers.get("ETag", "")
                         if etag:
                             self._cache[effective_cache_key] = CacheEntry(
@@ -318,9 +318,7 @@ class GitHubClient:
 
             except requests.RequestException as e:
                 if attempt < self.max_retries:
-                    delay = self.backoff_base_s * (2**attempt) + random.uniform(
-                        0, 0.25
-                    )
+                    delay = self.backoff_base_s * (2**attempt) + random.uniform(0, 0.25)
                     time.sleep(delay)
                     continue
                 raise GitHubError(f"Request failed: {e}") from e

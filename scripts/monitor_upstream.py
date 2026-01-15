@@ -86,14 +86,16 @@ def main() -> int:
             if repo_has_updates:
                 has_updates = True
 
-            results.append({
-                "repo": repo_name,
-                "file": yaml_file,
-                "stored_sha": stored_sha,
-                "upstream_sha": upstream_sha,
-                "has_updates": repo_has_updates,
-                "origin_url": origin_url,
-            })
+            results.append(
+                {
+                    "repo": repo_name,
+                    "file": yaml_file,
+                    "stored_sha": stored_sha,
+                    "upstream_sha": upstream_sha,
+                    "has_updates": repo_has_updates,
+                    "origin_url": origin_url,
+                }
+            )
 
     if args.json_output:
         print(json.dumps(results, indent=2))
@@ -110,7 +112,9 @@ def main() -> int:
             stored_short = r["stored_sha"][:12] if r["stored_sha"] else "N/A"
             upstream_short = r["upstream_sha"][:12] if r["upstream_sha"] else "N/A"
             status = "UPDATES" if r["has_updates"] else "current"
-            print(f"{r['repo']:<{name_width}}  {stored_short:<12} {upstream_short:<12} {status}")
+            print(
+                f"{r['repo']:<{name_width}}  {stored_short:<12} {upstream_short:<12} {status}"
+            )
 
         print()
         updates_count = sum(1 for r in results if r["has_updates"])

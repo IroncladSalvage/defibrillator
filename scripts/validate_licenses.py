@@ -286,11 +286,15 @@ def main() -> int:
             if status == "ok":
                 print(f"✅ {file_name}: {origin} ({source})")
             elif status == "mismatch":
-                print(f"❌ {file_name}: expected {origin}, detected {detected} ({source})")
+                print(
+                    f"❌ {file_name}: expected {origin}, detected {detected} ({source})"
+                )
             elif status == "missing_license":
                 print(f"⚠️  {file_name}: expected {origin}, no LICENSE file found")
             elif status == "unknown":
-                print(f"⚠️  {file_name}: expected {origin}, detected {detected} ({source})")
+                print(
+                    f"⚠️  {file_name}: expected {origin}, detected {detected} ({source})"
+                )
             else:
                 print(f"❌ {file_name}: error - {details}")
 
