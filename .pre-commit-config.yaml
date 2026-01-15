@@ -16,6 +16,6 @@ repos:
       - id: ty-check
         name: ty check
         language: system
-        entry: uvx ty@latest check
+        entry: uv run --with ty -- ty check
         types: [python]
         pass_filenames: false
