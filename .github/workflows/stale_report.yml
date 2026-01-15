@@ -1,0 +1,82 @@
+name: Stale Repository Report
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+    inputs:
+      warning_days:
+        description: 'Warning threshold in days'
+        required: false
+        default: '75'
+      critical_days:
+        description: 'Critical threshold in days'
+        required: false
+        default: '90'
+      show_all:
+        description: 'Show all repos including ok status'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  stale-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Generate stale report
+        id: report
+        run: |
+          WARNING_DAYS="${{ github.event.inputs.warning_days || 75 }}"
+          CRITICAL_DAYS="${{ github.event.inputs.critical_days || 90 }}"
+          SHOW_ALL="${{ github.event.inputs.show_all || false }}"
+
+          OUTPUT_FILE=stale_report.txt
+          ARGS="--warning-days $WARNING_DAYS --critical-days $CRITICAL_DAYS"
+
+          if [ "$SHOW_ALL" = "true" ]; then
+            ARGS="$ARGS --all"
+          fi
+
+          uv run python scripts/stale_report.py $ARGS | tee $OUTPUT_FILE
+          
+          exit_code=$?
+          echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+          
+          echo "## Stale Repository Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat $OUTPUT_FILE >> $GITHUB_STEP_SUMMARY
+
+      - name: Create issue for critical stale repos
+        if: steps.report.outputs.exit_code == 2
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'stale-report'
+            });
+            
+            if (issues.length > 0) {
+              console.log('Existing stale report issue found, skipping creation');
+              return;
+            }
+            
+            const { data: issue } = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Stale Repositories Report - ${new Date().toISOString().split('T')[0]}`,
+              body: `The following repositories have critical staleness levels:\n\nSee workflow run for details: ${context.payload.repository.html_url}/actions/runs/${context.runId}`,
+              labels: ['stale-report', 'automation']
+            });
+            
+            console.log(`Created issue #${issue.number}`);
