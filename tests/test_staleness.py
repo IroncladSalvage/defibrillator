@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from datetime import date
 
-
 from defibrillator.dates import days_since, parse_date
 from defibrillator.staleness import StalenessResult, compute_staleness, to_json
 
@@ -46,9 +45,7 @@ class TestComputeStaleness:
             }
         ]
         today = date(2026, 1, 14)
-        results = compute_staleness(
-            repos, warning_days=75, critical_days=90, today=today
-        )
+        results = compute_staleness(repos, warning_days=75, critical_days=90, today=today)
 
         assert len(results) == 1
         assert results[0].severity == "ok"
@@ -63,9 +60,7 @@ class TestComputeStaleness:
             }
         ]
         today = date(2026, 1, 14)
-        results = compute_staleness(
-            repos, warning_days=75, critical_days=90, today=today
-        )
+        results = compute_staleness(repos, warning_days=75, critical_days=90, today=today)
 
         assert len(results) == 1
         assert results[0].severity == "warning"
@@ -80,9 +75,7 @@ class TestComputeStaleness:
             }
         ]
         today = date(2026, 1, 14)
-        results = compute_staleness(
-            repos, warning_days=75, critical_days=90, today=today
-        )
+        results = compute_staleness(repos, warning_days=75, critical_days=90, today=today)
 
         assert len(results) == 1
         assert results[0].severity == "critical"
@@ -97,9 +90,7 @@ class TestComputeStaleness:
             }
         ]
         today = date(2026, 1, 14)
-        results = compute_staleness(
-            repos, warning_days=75, critical_days=90, today=today
-        )
+        results = compute_staleness(repos, warning_days=75, critical_days=90, today=today)
 
         assert len(results) == 1
         assert results[0].severity == "critical"
@@ -115,19 +106,13 @@ class TestComputeStaleness:
         ]
         today = date(2026, 1, 14)
 
-        results_default = compute_staleness(
-            repos, warning_days=75, critical_days=90, today=today
-        )
+        results_default = compute_staleness(repos, warning_days=75, critical_days=90, today=today)
         assert results_default[0].severity == "ok"
 
-        results_strict = compute_staleness(
-            repos, warning_days=7, critical_days=14, today=today
-        )
+        results_strict = compute_staleness(repos, warning_days=7, critical_days=14, today=today)
         assert results_strict[0].severity == "warning"
 
-        results_very_strict = compute_staleness(
-            repos, warning_days=5, critical_days=10, today=today
-        )
+        results_very_strict = compute_staleness(repos, warning_days=5, critical_days=10, today=today)
         assert results_very_strict[0].severity == "critical"
 
     def test_multiple_repos(self):
@@ -149,9 +134,7 @@ class TestComputeStaleness:
             },
         ]
         today = date(2026, 1, 14)
-        results = compute_staleness(
-            repos, warning_days=75, critical_days=90, today=today
-        )
+        results = compute_staleness(repos, warning_days=75, critical_days=90, today=today)
 
         assert len(results) == 3
         severities = {r.repo_name: r.severity for r in results}

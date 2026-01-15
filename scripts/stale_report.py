@@ -29,9 +29,7 @@ def format_table(results: list[StalenessResult]) -> str:
         last_touched = r.last_touched if r.last_touched else "N/A"
         days = r.days_stale if r.days_stale is not None else "N/A"
         icon = severity_icons.get(r.severity, "")
-        lines.append(
-            f"| {r.repo_name} | {last_touched} | {days} | {icon} {r.severity} |"
-        )
+        lines.append(f"| {r.repo_name} | {last_touched} | {days} | {icon} {r.severity} |")
 
     return "\n".join(lines)
 
@@ -97,9 +95,7 @@ def main() -> int:
     if not args.show_all:
         results = [r for r in results if r.severity in ("warning", "critical")]
 
-    results.sort(
-        key=lambda r: r.days_stale if r.days_stale is not None else -1, reverse=True
-    )
+    results.sort(key=lambda r: r.days_stale if r.days_stale is not None else -1, reverse=True)
 
     if args.json_output:
         print(json.dumps(to_json(results), indent=2))

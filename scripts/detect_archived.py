@@ -4,7 +4,7 @@
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -34,7 +34,7 @@ def parse_owner_repo(url: str) -> tuple[str, str] | None:
 
 def today_utc() -> str:
     """Return today's date in UTC as YYYY-MM-DD."""
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    return datetime.now(UTC).strftime("%Y-%m-%d")
 
 
 def load_repo_yamls(repos_dir: Path) -> list[tuple[Path, dict[str, Any]]]:
@@ -55,16 +55,12 @@ def load_repo_yamls(repos_dir: Path) -> list[tuple[Path, dict[str, Any]]]:
 def write_repo_yaml(path: Path, data: dict[str, Any]) -> None:
     """Write repo data back to YAML file."""
     with open(path, "w", encoding="utf-8") as f:
-        yaml.dump(
-            data, f, default_flow_style=False, sort_keys=False, allow_unicode=True
-        )
+        yaml.dump(data, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
 
 
 def main() -> int:
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Detect archived status of origin repositories via GitHub API."
-    )
+    parser = argparse.ArgumentParser(description="Detect archived status of origin repositories via GitHub API.")
     parser.add_argument(
         "--repos-dir",
         type=Path,
@@ -160,18 +156,13 @@ def main() -> int:
         for r in results:
             if r["updated"]:
                 action = "updated" if args.write else "would update"
-                print(
-                    f"🔍 {r['file']}: {r['repo']} is archived ({action} archived_date to {r['archived_date']})"
-                )
+                print(f"🔍 {r['file']}: {r['repo']} is archived ({action} archived_date to {r['archived_date']})")
             elif r["was_archived"]:
-                print(
-                    f"📦 {r['file']}: {r['repo']} is archived (archived_date already set: {r['archived_date']})"
-                )
+                print(f"📦 {r['file']}: {r['repo']} is archived (archived_date already set: {r['archived_date']})")
 
         print()
-        print(
-            f"Checked {len(results)} repo(s): {archived_count} archived, {updated_count} {'updated' if args.write else 'need update'}"
-        )
+        update_text = "updated" if args.write else "need update"
+        print(f"Checked {len(results)} repo(s): {archived_count} archived, {updated_count} {update_text}")
         if not args.write and updated_count > 0:
             print("Run with --write to update YAML files.")
 

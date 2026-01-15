@@ -7,9 +7,10 @@ import os
 import random
 import re
 import time
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterator, Literal
+from typing import Any, Literal
 from urllib.parse import urlencode
 
 import requests
@@ -39,7 +40,8 @@ class GitHubHTTPError(GitHubError):
     headers: dict[str, str] = field(default_factory=dict)
 
     def __str__(self) -> str:
-        return f"GitHub API error {self.status_code} for {self.url}: {self.response_text[:200] if self.response_text else 'No response body'}"
+        error_text = self.response_text[:200] if self.response_text else "No response body"
+        return f"GitHub API error {self.status_code} for {self.url}: {error_text}"
 
 
 @dataclass
@@ -101,9 +103,7 @@ class GitHubClient:
                 break
 
         if auth == "required" and not self._token:
-            raise GitHubAuthError(
-                f"GitHub token required but not found in environment variables: {token_env}"
-            )
+            raise GitHubAuthError(f"GitHub token required but not found in environment variables: {token_env}")
 
         self._session = requests.Session()
         self._cache: dict[str, CacheEntry] = {}
@@ -196,9 +196,7 @@ class GitHubClient:
 
         return False
 
-    def _calculate_retry_delay(
-        self, response: requests.Response, attempt: int
-    ) -> float:
+    def _calculate_retry_delay(self, response: requests.Response, attempt: int) -> float:
         """Calculate delay before retry."""
         retry_after = response.headers.get("Retry-After")
         if retry_after:

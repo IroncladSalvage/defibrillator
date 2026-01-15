@@ -51,9 +51,7 @@ def validate_field(data: dict, path: str, expected_type: type) -> list[str]:
         current = current[key]
 
     if not isinstance(current, expected_type):
-        errors.append(
-            f"Field '{path}' should be {expected_type.__name__}, got {type(current).__name__}"
-        )
+        errors.append(f"Field '{path}' should be {expected_type.__name__}, got {type(current).__name__}")
 
     return errors
 
@@ -90,24 +88,18 @@ def validate_repo_yaml(file_path: Path) -> list[str]:
     if "status" in data and isinstance(data["status"], dict):
         state = data["status"].get("state")
         if state and state not in VALID_STATES:
-            errors.append(
-                f"Invalid status.state '{state}'. Must be one of: {VALID_STATES}"
-            )
+            errors.append(f"Invalid status.state '{state}'. Must be one of: {VALID_STATES}")
 
         ci_status = data["status"].get("ci_status")
         if ci_status and ci_status not in VALID_CI_STATUSES:
-            errors.append(
-                f"Invalid status.ci_status '{ci_status}'. Must be one of: {VALID_CI_STATUSES}"
-            )
+            errors.append(f"Invalid status.ci_status '{ci_status}'. Must be one of: {VALID_CI_STATUSES}")
 
     # Validate architectures
     if "targets" in data and isinstance(data["targets"], dict):
         archs = data["targets"].get("architectures", [])
         for arch in archs:
             if arch not in VALID_ARCHITECTURES:
-                errors.append(
-                    f"Invalid architecture '{arch}'. Must be one of: {VALID_ARCHITECTURES}"
-                )
+                errors.append(f"Invalid architecture '{arch}'. Must be one of: {VALID_ARCHITECTURES}")
 
         oses = data["targets"].get("operating_systems", [])
         for os in oses:
@@ -118,9 +110,7 @@ def validate_repo_yaml(file_path: Path) -> list[str]:
     if "metadata" in data and isinstance(data["metadata"], dict):
         priority = data["metadata"].get("priority")
         if priority and priority not in VALID_PRIORITIES:
-            errors.append(
-                f"Invalid metadata.priority '{priority}'. Must be one of: {VALID_PRIORITIES}"
-            )
+            errors.append(f"Invalid metadata.priority '{priority}'. Must be one of: {VALID_PRIORITIES}")
 
     # Validate non-empty required string fields
     if "origin" in data and isinstance(data["origin"], dict):
@@ -133,9 +123,7 @@ def validate_repo_yaml(file_path: Path) -> list[str]:
         if "archived_date" in data["origin"]:
             archived_date = data["origin"]["archived_date"]
             if archived_date is not None and not isinstance(archived_date, str):
-                errors.append(
-                    "origin.archived_date must be null or a date string (YYYY-MM-DD)"
-                )
+                errors.append("origin.archived_date must be null or a date string (YYYY-MM-DD)")
 
     if "fork" in data and isinstance(data["fork"], dict):
         if not data["fork"].get("url"):

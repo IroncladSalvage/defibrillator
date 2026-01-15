@@ -99,9 +99,7 @@ def parse_github_url(url: str) -> tuple[str, str] | None:
     return None
 
 
-def fetch_license_spdx(
-    client: GitHubClient, owner: str, repo: str
-) -> tuple[str | None, str, str]:
+def fetch_license_spdx(client: GitHubClient, owner: str, repo: str) -> tuple[str | None, str, str]:
     """Fetch license SPDX ID from GitHub API.
 
     Returns: (spdx_id, source, details)
@@ -132,9 +130,7 @@ def fetch_license_spdx(
         raise
 
 
-def validate_license(
-    yaml_path: Path, client: GitHubClient, verbose: bool = False
-) -> dict[str, Any]:
+def validate_license(yaml_path: Path, client: GitHubClient, verbose: bool = False) -> dict[str, Any]:
     """Validate a single repository's license."""
     result: dict[str, Any] = {
         "file": yaml_path.name,
@@ -200,9 +196,7 @@ def validate_license(
 
 def main() -> int:
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Validate repository license files against YAML declarations."
-    )
+    parser = argparse.ArgumentParser(description="Validate repository license files against YAML declarations.")
     parser.add_argument(
         "--repos-dir",
         type=Path,
@@ -247,9 +241,7 @@ def main() -> int:
             print(f"Error: file not found: {yaml_files[0]}", file=sys.stderr)
             return 2
     else:
-        yaml_files = sorted(
-            list(repos_dir.glob("*.yaml")) + list(repos_dir.glob("*.yml"))
-        )
+        yaml_files = sorted(list(repos_dir.glob("*.yaml")) + list(repos_dir.glob("*.yml")))
 
     if not yaml_files:
         if args.format == "json":
@@ -286,15 +278,11 @@ def main() -> int:
             if status == "ok":
                 print(f"✅ {file_name}: {origin} ({source})")
             elif status == "mismatch":
-                print(
-                    f"❌ {file_name}: expected {origin}, detected {detected} ({source})"
-                )
+                print(f"❌ {file_name}: expected {origin}, detected {detected} ({source})")
             elif status == "missing_license":
                 print(f"⚠️  {file_name}: expected {origin}, no LICENSE file found")
             elif status == "unknown":
-                print(
-                    f"⚠️  {file_name}: expected {origin}, detected {detected} ({source})"
-                )
+                print(f"⚠️  {file_name}: expected {origin}, detected {detected} ({source})")
             else:
                 print(f"❌ {file_name}: error - {details}")
 

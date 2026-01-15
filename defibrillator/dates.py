@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 
 def parse_date(s: str) -> date | None:
@@ -15,7 +15,7 @@ def parse_date(s: str) -> date | None:
 
 def today_utc() -> date:
     """Return today's date in UTC."""
-    return datetime.now(timezone.utc).date()
+    return datetime.now(UTC).date()
 
 
 def days_since(date_str: str, today: date | None = None) -> int | None:

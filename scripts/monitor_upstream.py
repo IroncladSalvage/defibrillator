@@ -14,9 +14,7 @@ from defibrillator.upstream import get_upstream_head, is_behind_upstream
 
 def main() -> int:
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Monitor upstream repositories for new commits."
-    )
+    parser = argparse.ArgumentParser(description="Monitor upstream repositories for new commits.")
     parser.add_argument(
         "--repos-dir",
         type=Path,
@@ -112,9 +110,7 @@ def main() -> int:
             stored_short = r["stored_sha"][:12] if r["stored_sha"] else "N/A"
             upstream_short = r["upstream_sha"][:12] if r["upstream_sha"] else "N/A"
             status = "UPDATES" if r["has_updates"] else "current"
-            print(
-                f"{r['repo']:<{name_width}}  {stored_short:<12} {upstream_short:<12} {status}"
-            )
+            print(f"{r['repo']:<{name_width}}  {stored_short:<12} {upstream_short:<12} {status}")
 
         print()
         updates_count = sum(1 for r in results if r["has_updates"])

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from defibrillator.staleness import compute_staleness, StalenessResult
+from defibrillator.staleness import StalenessResult, compute_staleness
 
 STATUS_EMOJI = {
     "active": "🟢",
@@ -86,16 +86,13 @@ def generate_summary_table(repos: list[dict]) -> str:
         status_icon = STATUS_EMOJI.get(state, "❓")
         ci_icon = CI_EMOJI.get(ci, "❓")
 
-        lines.append(
-            f"| [{name}]({url}) | {status_icon} {state} | {ci_icon} | {languages} | {archs} | [📋](info/{file_stem}.md) |"
-        )
+        info_link = f"[📋](info/{file_stem}.md)"
+        lines.append(f"| [{name}]({url}) | {status_icon} {state} | {ci_icon} | {languages} | {archs} | {info_link} |")
 
     return "\n".join(lines)
 
 
-def generate_repo_detail_page(
-    repo: dict, staleness_result: StalenessResult | None = None
-) -> str:
+def generate_repo_detail_page(repo: dict, staleness_result: StalenessResult | None = None) -> str:
     """Generate detailed markdown page for a repository."""
     fork = repo.get("fork", {})
     origin = repo.get("origin", {})
@@ -114,9 +111,7 @@ def generate_repo_detail_page(
 
     lines.append("## Overview")
     lines.append("")
-    lines.append(
-        f"- **Origin:** [{origin.get('name', 'Unknown')}]({origin.get('url', '#')})"
-    )
+    lines.append(f"- **Origin:** [{origin.get('name', 'Unknown')}]({origin.get('url', '#')})")
     lines.append(f"- **Fork:** [{fork.get('name', name)}]({fork.get('url', '#')})")
     lines.append(f"- **License:** {origin.get('license', 'Unknown')}")
     lines.append(f"- **Created:** {fork.get('created_at', 'Unknown')}")
@@ -128,27 +123,15 @@ def generate_repo_detail_page(
     lines.append("")
     lines.append("## Status")
     lines.append("")
-    lines.append(
-        f"- **State:** {STATUS_EMOJI.get(status.get('state'), '❓')} {status.get('state', 'unknown')}"
-    )
-    lines.append(
-        f"- **CI:** {CI_EMOJI.get(status.get('ci_status'), '❓')} {status.get('ci_status', 'unknown')}"
-    )
+    lines.append(f"- **State:** {STATUS_EMOJI.get(status.get('state'), '❓')} {status.get('state', 'unknown')}")
+    lines.append(f"- **CI:** {CI_EMOJI.get(status.get('ci_status'), '❓')} {status.get('ci_status', 'unknown')}")
     lines.append(f"- **Last Touched:** {status.get('last_touched', 'Unknown')}")
-    lines.append(
-        f"- **Last Upstream Commit:** `{origin.get('last_upstream_commit', 'Unknown')}`"
-    )
+    lines.append(f"- **Last Upstream Commit:** `{origin.get('last_upstream_commit', 'Unknown')}`")
 
     if staleness_result:
         emoji = STALE_EMOJI.get(staleness_result.severity, "")
-        days_str = (
-            f"{staleness_result.days_stale} days"
-            if staleness_result.days_stale is not None
-            else "N/A"
-        )
-        lines.append(
-            f"- **Staleness:** {emoji} {days_str} ({staleness_result.severity})"
-        )
+        days_str = f"{staleness_result.days_stale} days" if staleness_result.days_stale is not None else "N/A"
+        lines.append(f"- **Staleness:** {emoji} {days_str} ({staleness_result.severity})")
 
     if status.get("notes"):
         lines.append(f"- **Notes:** {status['notes']}")
@@ -157,12 +140,8 @@ def generate_repo_detail_page(
     lines.append("## Targets")
     lines.append("")
     lines.append(f"- **Languages:** {', '.join(repo.get('languages', ['N/A']))}")
-    lines.append(
-        f"- **Architectures:** {', '.join(targets.get('architectures', ['N/A']))}"
-    )
-    lines.append(
-        f"- **Operating Systems:** {', '.join(targets.get('operating_systems', ['N/A']))}"
-    )
+    lines.append(f"- **Architectures:** {', '.join(targets.get('architectures', ['N/A']))}")
+    lines.append(f"- **Operating Systems:** {', '.join(targets.get('operating_systems', ['N/A']))}")
 
     runtimes = targets.get("runtimes", [])
     if runtimes:
@@ -190,15 +169,9 @@ def generate_repo_detail_page(
         lines.append("")
         lines.append("## Automation")
         lines.append("")
-        lines.append(
-            f"- **Dependabot:** {'✅' if automation.get('dependabot') else '❌'}"
-        )
-        lines.append(
-            f"- **Security Scanning:** {'✅' if automation.get('security_scanning') else '❌'}"
-        )
-        lines.append(
-            f"- **Auto Release:** {'✅' if automation.get('auto_release') else '❌'}"
-        )
+        lines.append(f"- **Dependabot:** {'✅' if automation.get('dependabot') else '❌'}")
+        lines.append(f"- **Security Scanning:** {'✅' if automation.get('security_scanning') else '❌'}")
+        lines.append(f"- **Auto Release:** {'✅' if automation.get('auto_release') else '❌'}")
 
     # Metadata
     tags = metadata.get("tags", [])
@@ -221,9 +194,7 @@ def generate_overview_table(repos: list[dict]) -> str:
     """Generate overview stats table."""
     total = len(repos)
     active = sum(1 for r in repos if r.get("status", {}).get("state") == "active")
-    life_support = sum(
-        1 for r in repos if r.get("status", {}).get("state") == "life-support"
-    )
+    life_support = sum(1 for r in repos if r.get("status", {}).get("state") == "life-support")
     archived = sum(1 for r in repos if r.get("status", {}).get("state") == "archived")
 
     return f"""| Total | 🟢 Active | 🟡 Life Support | ⚫ Archived |
@@ -265,9 +236,7 @@ def update_readme(readme_path: Path, overview_table: str, repos_table: str) -> N
     print(f"Updated: {readme_path}")
 
 
-def generate_info_pages(
-    repos: list[dict], info_dir: Path, staleness_map: dict[str, StalenessResult]
-) -> None:
+def generate_info_pages(repos: list[dict], info_dir: Path, staleness_map: dict[str, StalenessResult]) -> None:
     """Generate individual info pages for each repository."""
     if info_dir.exists():
         shutil.rmtree(info_dir)
@@ -292,9 +261,7 @@ def main() -> None:
     repos = load_repos(repos_dir)
     repos = sort_repos(repos)
 
-    staleness_results = compute_staleness(
-        repos, warning_days=STALE_WARNING_DAYS, critical_days=STALE_CRITICAL_DAYS
-    )
+    staleness_results = compute_staleness(repos, warning_days=STALE_WARNING_DAYS, critical_days=STALE_CRITICAL_DAYS)
     staleness_map = {r.file_stem: r for r in staleness_results}
 
     overview_table = generate_overview_table(repos)
